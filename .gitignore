@@ -1,0 +1,13 @@
+.claude/
+.env
+__pycache__/
+*.pyc
+*.pyo
+db.sqlite3
+venv/
+venv2/
+node_modules/
+/frontend/build/
+*.log
+media/products/
+staticfiles/
