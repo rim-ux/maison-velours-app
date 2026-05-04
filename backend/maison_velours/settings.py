@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'apps.delivery',
     'apps.payments',
     'apps.stats',
+    'apps.notifications',
 ]
 
 MIDDLEWARE = [
@@ -114,8 +115,15 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-]
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ]
 CORS_ALLOW_CREDENTIALS = True
+
+# Stripe
+STRIPE_SECRET_KEY      = os.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_WEBHOOK_SECRET  = os.getenv('STRIPE_WEBHOOK_SECRET', '')

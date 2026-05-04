@@ -4,27 +4,31 @@ from .models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=6)
+    password  = serializers.CharField(write_only=True, min_length=6)
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'password2', 'first_name', 'last_name', 'phone', 'address', 'role']
-        extra_kwargs = {'role': {'required': False}}
+        extra_kwargs = {
+            'role':       {'required': False},
+            'address':    {'required': False, 'allow_blank': True},
+            'phone':      {'required': False, 'allow_blank': True},
+            'first_name': {'required': False, 'allow_blank': True},
+            'last_name':  {'required': False, 'allow_blank': True},
+            'email':      {'required': False, 'allow_blank': True},
+        }
 
     def validate(self, data):
         if data['password'] != data['password2']:
-            raise serializers.ValidationError("Les mots de passe ne correspondent pas.")
+            raise serializers.ValidationError({'password': "Les mots de passe ne correspondent pas."})
         return data
 
     def create(self, validated_data):
         validated_data.pop('password2')
         password = validated_data.pop('password')
-        # Prevent self-promotion to admin via public registration
-        validated_data['role'] = 'client'
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
+        validated_data.pop('role', None)
+        user = User.objects.create_user(password=password, role='client', **validated_data)
         return user
 
 
