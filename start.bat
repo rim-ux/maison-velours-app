@@ -6,7 +6,7 @@ echo    MAISON VELOURS — Demarrage
 echo =====================================================
 echo.
 echo Demarrage du serveur Django (Backend)...
-start "Django Backend" cmd /k "cd /d %~dp0backend && call venv\Scripts\activate && python manage.py runserver"
+start "Django Backend" cmd /k "cd /d %~dp0backend && (if exist venv2\Scripts\activate (call venv2\Scripts\activate) else call venv\Scripts\activate) && python manage.py runserver"
 
 timeout /t 3 >nul
 

@@ -1,0 +1,81 @@
+/* ===== LANDING PAGE — Home.css ===== */
+
+/* ---------- Bento Grid ---------- */
+.bento-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-areas:
+    "main main main main main main main bar  bar  bar  cave cave"
+    "main main main main main main main ter  ter  acc  acc  acc"
+    "det  det  det  det  det  det  ter  ter  acc  acc  acc  acc";
+}
+
+.bento-cell        { min-height: 200px; }
+.bento-main        { grid-area: main;    min-height: 420px; }
+.bento-bar         { grid-area: bar;     min-height: 190px; }
+.bento-cave        { grid-area: cave;    min-height: 190px; }
+.bento-terrasse    { grid-area: ter;     min-height: 190px; }
+.bento-accueil     { grid-area: acc;     min-height: 190px; }
+.bento-detail      { grid-area: det;     min-height: 170px; }
+
+@media (max-width: 960px) {
+  .bento-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "main main"
+      "bar  cave"
+      "ter  acc"
+      "det  det";
+  }
+  .bento-main     { min-height: 320px; }
+  .bento-bar,
+  .bento-cave,
+  .bento-terrasse,
+  .bento-accueil  { min-height: 200px; }
+}
+
+@media (max-width: 560px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "bar"
+      "cave"
+      "ter"
+      "acc"
+      "det";
+  }
+}
+
+/* ---------- Reservation form 2-col grid ---------- */
+.res-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .res-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Landing page dark body override ---------- */
+.landing-page {
+  background: #080810;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Mobile navbar helpers */
+@media (max-width: 768px) {
+  .hide-mobile      { display: none !important; }
+  .show-mobile-flex { display: flex !important; }
+}
+
+/* histoire-grid responsive */
+@media (max-width: 860px) {
+  .histoire-grid {
+    grid-template-columns: 1fr !important;
+    gap: 3rem !important;
+  }
+}

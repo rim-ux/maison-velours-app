@@ -26,10 +26,20 @@ export default function Register() {
       await register(form);
       navigate('/menu');
     } catch (err) {
-      const data = err.response?.data;
-      if (data) {
-        const msgs = Object.values(data).flat().join(' ');
-        setError(msgs);
+      if (!err.response) {
+        setError('Impossible de contacter le serveur. Vérifiez que le backend est démarré.');
+        setLoading(false);
+        return;
+      }
+      const data = err.response.data;
+      if (data && typeof data === 'object') {
+        const msgs = Object.entries(data)
+          .flatMap(([key, val]) => {
+            const label = key === 'non_field_errors' ? '' : `${key} : `;
+            return (Array.isArray(val) ? val : [val]).map(m => `${label}${m}`);
+          })
+          .join(' ');
+        setError(msgs || 'Données invalides. Vérifiez les champs.');
       } else {
         setError('Une erreur est survenue. Veuillez réessayer.');
       }

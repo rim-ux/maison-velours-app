@@ -3,13 +3,15 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const NAV_ITEMS = [
-  { to: '/admin',            icon: '📊', label: 'Tableau de bord', end: true },
-  { to: '/admin/commandes',  icon: '📋', label: 'Commandes' },
-  { to: '/admin/menu',       icon: '🍽️', label: 'Menu' },
-  { to: '/admin/tables',     icon: '🪑', label: 'Tables' },
-  { to: '/admin/livraison',  icon: '🛵', label: 'Zones de livraison' },
-  { to: '/admin/paiements',  icon: '💳', label: 'Paiements' },
-  { to: '/admin/stats',      icon: '📈', label: 'Statistiques' },
+  { to: '/admin',                icon: '📊', label: 'Tableau de bord',  end: true },
+  { to: '/admin/commandes',      icon: '📋', label: 'Commandes' },
+  { to: '/admin/reservations',   icon: '🗓️', label: 'Réservations' },
+  { to: '/admin/messagerie',     icon: '💬', label: 'Messagerie' },
+  { to: '/admin/menu',           icon: '🍽️', label: 'Menu' },
+  { to: '/admin/tables',         icon: '🪑', label: 'Tables' },
+  { to: '/admin/livraison',      icon: '🛵', label: 'Zones de livraison' },
+  { to: '/admin/paiements',      icon: '💳', label: 'Paiements' },
+  { to: '/admin/stats',          icon: '📈', label: 'Statistiques' },
 ];
 
 export default function AdminSidebar() {

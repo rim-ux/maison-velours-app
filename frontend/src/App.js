@@ -1,27 +1,35 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
+import { CartProvider }   from './context/CartContext';
+import { ToastProvider }  from './context/ToastContext';
 
-import Navbar        from './components/Navbar';
-import Footer        from './components/Footer';
-import AdminSidebar  from './components/AdminSidebar';
+import AdminNavbar  from './components/AdminNavbar';
+import ClientNavbar  from './components/ClientNavbar';
 
-import Login         from './pages/auth/Login';
-import Register      from './pages/auth/Register';
-import Menu          from './pages/client/Menu';
-import Cart          from './pages/client/Cart';
-import Checkout      from './pages/client/Checkout';
-import OrderTracking from './pages/client/OrderTracking';
-import MyOrders      from './pages/client/MyOrders';
+import Home           from './pages/landing/Home';
+import Login          from './pages/auth/Login';
+import Register       from './pages/auth/Register';
+import Cart           from './pages/client/Cart';
+import Checkout       from './pages/client/Checkout';
+import OrderTracking  from './pages/client/OrderTracking';
+import MyOrders       from './pages/client/MyOrders';
+import Messages       from './pages/client/Messages';
+import MyReservations from './pages/client/MyReservations';
+import ClientHome     from './pages/client/ClientHome';
+import MonCompte      from './pages/client/MonCompte';
+import MesFavoris     from './pages/client/MesFavoris';
 
-import Dashboard         from './pages/admin/Dashboard';
-import OrdersManagement  from './pages/admin/OrdersManagement';
-import MenuManagement    from './pages/admin/MenuManagement';
-import TablesManagement  from './pages/admin/TablesManagement';
-import DeliveryZones     from './pages/admin/DeliveryZones';
-import Payments          from './pages/admin/Payments';
-import Statistics        from './pages/admin/Statistics';
+import AdminHome              from './pages/admin/AdminHome';
+import Dashboard              from './pages/admin/Dashboard';
+import OrdersManagement       from './pages/admin/OrdersManagement';
+import MenuManagement         from './pages/admin/MenuManagement';
+import TablesManagement       from './pages/admin/TablesManagement';
+import DeliveryZones          from './pages/admin/DeliveryZones';
+import Payments               from './pages/admin/Payments';
+import Statistics             from './pages/admin/Statistics';
+import ReservationsManagement from './pages/admin/ReservationsManagement';
+import MessagesAdmin          from './pages/admin/MessagesAdmin';
 
 /* ── Guards ── */
 function RequireAuth({ children }) {
@@ -33,30 +41,29 @@ function RequireAuth({ children }) {
 function RequireAdmin({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="spinner" style={{ marginTop: 120 }} />;
-  if (!user)            return <Navigate to="/login" replace />;
-  if (user.role !== 'admin') return <Navigate to="/menu" replace />;
+  if (!user)              return <Navigate to="/login" replace />;
+  if (user.role !== 'admin') return <Navigate to="/" replace />;
   return children;
 }
 
-/* ── Client layout (Navbar + Footer) ── */
+/* ── Client layout ── */
 function ClientLayout() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
-      <main style={{ flex: 1 }}>
+    <div style={{ minHeight: '100vh', background: 'var(--cream)', fontFamily: 'var(--font-body)' }}>
+      <ClientNavbar />
+      <main style={{ paddingTop: 104 }}>
         <Outlet />
       </main>
-      <Footer />
     </div>
   );
 }
 
-/* ── Admin layout (Sidebar + content) ── */
+/* ── Admin layout ── */
 function AdminLayout() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <AdminSidebar />
-      <main style={{ marginLeft: 250, flex: 1, padding: '2rem', background: 'var(--cream)', minHeight: '100vh' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--cream)', fontFamily: 'var(--font-body)' }}>
+      <AdminNavbar />
+      <main style={{ paddingTop: 64, padding: '64px 2rem 2rem' }}>
         <Outlet />
       </main>
     </div>
@@ -67,38 +74,54 @@ function AdminLayout() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <Routes>
-            {/* Public auth */}
-            <Route path="/login"    element={<Login />} />
-            <Route path="/register" element={<Register />} />
+      <ToastProvider>
+        <AuthProvider>
+          <CartProvider>
+              <Routes>
+                {/* Public */}
+                <Route path="/login"    element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-            {/* Client routes */}
-            <Route element={<ClientLayout />}>
-              <Route path="/"            element={<Navigate to="/menu" replace />} />
-              <Route path="/menu"        element={<Menu />} />
-              <Route path="/panier"      element={<Cart />} />
-              <Route path="/commande"    element={<RequireAuth><Checkout /></RequireAuth>} />
-              <Route path="/mes-commandes" element={<RequireAuth><MyOrders /></RequireAuth>} />
-              <Route path="/suivi-commande/:id" element={<RequireAuth><OrderTracking /></RequireAuth>} />
-            </Route>
+                {/* Landing */}
+                <Route path="/" element={<Home />} />
 
-            {/* Admin routes */}
-            <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
-              <Route index                 element={<Dashboard />} />
-              <Route path="commandes"      element={<OrdersManagement />} />
-              <Route path="menu"           element={<MenuManagement />} />
-              <Route path="tables"         element={<TablesManagement />} />
-              <Route path="livraison"      element={<DeliveryZones />} />
-              <Route path="paiements"      element={<Payments />} />
-              <Route path="stats"          element={<Statistics />} />
-            </Route>
+                {/* Client home — standalone */}
+                <Route path="/accueil" element={<RequireAuth><ClientHome /></RequireAuth>} />
 
-            <Route path="*" element={<Navigate to="/menu" replace />} />
-          </Routes>
-        </CartProvider>
-      </AuthProvider>
+                {/* Client routes */}
+                <Route element={<ClientLayout />}>
+                  <Route path="/panier"           element={<Cart />} />
+                  <Route path="/commande"         element={<RequireAuth><Checkout /></RequireAuth>} />
+                  <Route path="/mes-commandes"    element={<RequireAuth><MyOrders /></RequireAuth>} />
+                  <Route path="/mes-reservations" element={<RequireAuth><MyReservations /></RequireAuth>} />
+                  <Route path="/messagerie"       element={<RequireAuth><Messages /></RequireAuth>} />
+                  <Route path="/suivi-commande/:id" element={<RequireAuth><OrderTracking /></RequireAuth>} />
+                  <Route path="/mon-compte"       element={<RequireAuth><MonCompte /></RequireAuth>} />
+                  <Route path="/mes-favoris"      element={<RequireAuth><MesFavoris /></RequireAuth>} />
+                </Route>
+
+                {/* Admin home — standalone */}
+                <Route path="/admin" element={<RequireAdmin><AdminHome /></RequireAdmin>} />
+
+                {/* Admin messagerie — standalone */}
+                <Route path="/admin/messagerie" element={<RequireAdmin><MessagesAdmin /></RequireAdmin>} />
+
+                {/* Admin management routes — with sidebar */}
+                <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
+                  <Route path="commandes"    element={<OrdersManagement />} />
+                  <Route path="menu"         element={<MenuManagement />} />
+                  <Route path="tables"       element={<TablesManagement />} />
+                  <Route path="livraison"    element={<DeliveryZones />} />
+                  <Route path="paiements"    element={<Payments />} />
+                  <Route path="stats"        element={<Statistics />} />
+                  <Route path="reservations" element={<ReservationsManagement />} />
+                </Route>
+
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </CartProvider>
+          </AuthProvider>
+        </ToastProvider>
     </BrowserRouter>
   );
 }

@@ -31,7 +31,7 @@ export default function MyOrders() {
           <div className="icon">📋</div>
           <h3>Aucune commande</h3>
           <p>Vous n'avez pas encore passé de commande.</p>
-          <Link to="/menu" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>Découvrir le menu</Link>
+          <Link to="/accueil" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>Découvrir le menu</Link>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

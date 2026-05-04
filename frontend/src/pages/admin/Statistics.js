@@ -4,6 +4,7 @@ import {
   PieChart, Pie, Cell, Legend, LineChart, Line,
 } from 'recharts';
 import { statsAPI } from '../../services/api';
+import { printStatsPDF } from '../../utils/printPDF';
 
 const COLORS = ['#8B1A2E', '#C9A84C', '#3498DB', '#27AE60', '#9B59B6', '#E67E22'];
 const TYPE_LABELS = { sur_place: 'Sur place', emporter: 'À emporter', livraison: 'Livraison' };
@@ -37,7 +38,7 @@ export default function Statistics() {
     <div>
       <div style={styles.header}>
         <h1 style={styles.title}>Statistiques</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <label style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>Période :</label>
           {[7, 14, 30].map((d) => (
             <button
@@ -52,6 +53,22 @@ export default function Statistics() {
               {d} jours
             </button>
           ))}
+          <button
+            onClick={() => printStatsPDF({ overview, topProducts, dailyRev, byType, days })}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+              background: 'linear-gradient(135deg,var(--burgundy),#6B1220)',
+              color: '#fff', border: 'none',
+              padding: '0.45rem 1.1rem', borderRadius: 'var(--radius-sm)',
+              fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'var(--font-body)', letterSpacing: '0.04em',
+            }}
+          >
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Générer PDF
+          </button>
         </div>
       </div>
 

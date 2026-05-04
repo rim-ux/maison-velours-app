@@ -41,22 +41,39 @@ export default api;
 
 // Auth
 export const authAPI = {
-  register: (data) => api.post('/auth/register/', data),
-  login: (data) => api.post('/auth/login/', data),
-  me: () => api.get('/auth/me/'),
-  updateProfile: (data) => api.patch('/auth/me/', data),
+  register:       (data) => api.post('/auth/register/', data),
+  login:          (data) => api.post('/auth/login/', data),
+  me:             ()     => api.get('/auth/me/'),
+  updateProfile:  (data) => api.patch('/auth/me/', data),
+  changePassword: (data) => api.post('/auth/change-password/', data),
+  getAdminId:     ()     => api.get('/auth/admin-contact/'),
 };
 
 // Menu
+const multipartCfg = { headers: { 'Content-Type': 'multipart/form-data' } };
+
 export const menuAPI = {
-  getCategories: () => api.get('/menu/categories/'),
-  getProducts: (params) => api.get('/menu/products/', { params }),
-  createProduct: (data) => api.post('/menu/products/', data),
-  updateProduct: (id, data) => api.patch(`/menu/products/${id}/`, data),
-  deleteProduct: (id) => api.delete(`/menu/products/${id}/`),
-  createCategory: (data) => api.post('/menu/categories/', data),
-  updateCategory: (id, data) => api.patch(`/menu/categories/${id}/`, data),
-  deleteCategory: (id) => api.delete(`/menu/categories/${id}/`),
+  getCategories:   ()          => api.get('/menu/categories/'),
+  getProducts:     (params)    => api.get('/menu/products/', { params }),
+  createProduct:   (data)      => data instanceof FormData
+                                    ? api.post('/menu/products/', data, multipartCfg)
+                                    : api.post('/menu/products/', data),
+  updateProduct:   (id, data)  => data instanceof FormData
+                                    ? api.patch(`/menu/products/${id}/`, data, multipartCfg)
+                                    : api.patch(`/menu/products/${id}/`, data),
+  deleteProduct:   (id)        => api.delete(`/menu/products/${id}/`),
+  createCategory:  (data)      => api.post('/menu/categories/', data),
+  updateCategory:  (id, data)  => api.patch(`/menu/categories/${id}/`, data),
+  deleteCategory:  (id)        => api.delete(`/menu/categories/${id}/`),
+  bestSellers:     (limit = 6) => api.get('/menu/best-sellers/', { params: { limit } }),
+  recommendations: (ids = [])  => api.get('/menu/recommendations/', { params: { ids: ids.join(',') } }),
+};
+
+// Favorites
+export const favoritesAPI = {
+  list:     ()   => api.get('/menu/favorites/'),
+  products: ()   => api.get('/menu/favorites/products/'),
+  toggle:   (id) => api.post('/menu/favorites/toggle/', { product_id: id }),
 };
 
 // Orders
@@ -89,6 +106,35 @@ export const paymentsAPI = {
   list: () => api.get('/payments/'),
   create: (data) => api.post('/payments/', data),
   get: (id) => api.get(`/payments/${id}/`),
+};
+
+// Reservations
+export const reservationsAPI = {
+  create:         (data)     => api.post('/tables/reservations/', data),
+  list:           ()         => api.get('/tables/reservations/'),
+  myReservations: ()         => api.get('/tables/reservations/my_reservations/'),
+  update:         (id, data) => api.patch(`/tables/reservations/${id}/`, data),
+};
+
+// Notifications
+export const notificationsAPI = {
+  list:       ()   => api.get('/notifications/'),
+  markRead:   (id) => api.patch(`/notifications/${id}/read/`),
+  markAllRead: ()  => api.post('/notifications/read_all/'),
+  unreadCount: ()  => api.get('/notifications/unread_count/'),
+};
+
+// Messages
+export const messagesAPI = {
+  conversations: ()        => api.get('/messages/conversations/'),
+  thread:        (userId)  => api.get(`/messages/thread/?with=${userId}`),
+  send:          (recipientId, body) => api.post('/messages/send/', { recipient_id: recipientId, body }),
+};
+
+// Clients (admin)
+export const clientsAPI = {
+  list:   ()         => api.get('/auth/users/'),
+  update: (id, data) => api.patch(`/auth/users/${id}/`, data),
 };
 
 // Stats
