@@ -28,7 +28,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.select_related('category')
     serializer_class = ProductSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'description']
 
