@@ -33,22 +33,23 @@ export default function Hero() {
       overflow: 'hidden',
       background: '#080810',
     }}>
-      {/* ── Parallax background photo ── */}
-      {/* Pour ajouter une vraie photo : placez hero-restaurant.jpg dans public/images/ */}
-      <motion.div
+      {/* ── Vidéo de fond ── */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
         style={{
           position: 'absolute',
-          inset: '-20%',
-          y: bgY,
-          backgroundImage: `url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=80&auto=format&fit=crop'), linear-gradient(160deg,
-            #1C0510 0%, #3D0E20 12%, #200810 28%,
-            #0D1828 48%, #1A3050 68%, #100820 85%, #050508 100%)`,
-          backgroundSize: 'cover, 100% 100%',
-          backgroundPosition: 'center, center',
-          backgroundRepeat: 'no-repeat, no-repeat',
-          willChange: 'transform',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          pointerEvents: 'none',
         }}
-      />
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
 
       {/* ── Overlay sombre dégradé (lisibilité + thème) ── */}
       <div style={{
@@ -155,15 +156,15 @@ export default function Hero() {
             Elevating everyday cravings into extraordinary experiences.
           </motion.p>
 
-          {/* CTA buttons */}
+          {/* CTA button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.58, ease }}
-            style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
+            style={{ display: 'flex', justifyContent: 'center' }}
           >
             <motion.button
-              onClick={() => document.getElementById('auth-cta')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => document.getElementById('menu-preview')?.scrollIntoView({ behavior: 'smooth' })}
               whileHover={{ scale: 1.05, boxShadow: '0 16px 48px rgba(201,168,76,0.55)' }}
               whileTap={{ scale: 0.97 }}
               style={{
@@ -175,22 +176,6 @@ export default function Hero() {
                 border: 'none', cursor: 'pointer',
                 fontFamily: 'var(--font-body)',
                 boxShadow: '0 6px 28px rgba(201,168,76,0.38)',
-              }}
-            >
-              Commander / Se connecter
-            </motion.button>
-
-            <motion.button
-              onClick={() => document.getElementById('menu-preview')?.scrollIntoView({ behavior: 'smooth' })}
-              whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.6)' }}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                background: 'transparent', color: '#fff',
-                padding: '1rem 2.75rem', borderRadius: 10,
-                fontSize: '0.88rem', fontWeight: 500,
-                letterSpacing: '0.05em',
-                border: '1px solid rgba(255,255,255,0.28)',
-                cursor: 'pointer', fontFamily: 'var(--font-body)',
               }}
             >
               Découvrir la carte

@@ -9,6 +9,7 @@ export default function Messages() {
   const [adminId,       setAdminId]       = useState(null);
   const [loading,       setLoading]       = useState(true);
   const [sending,       setSending]       = useState(false);
+  const [sendError,     setSendError]     = useState('');
   const bottomRef = useRef(null);
 
   // Fetch notifications
@@ -50,11 +51,18 @@ export default function Messages() {
     e.preventDefault();
     if (!newMsg.trim() || !adminId) return;
     setSending(true);
+    setSendError('');
     try {
       const { data } = await messagesAPI.send(adminId, newMsg.trim());
       setMessages(prev => [...prev, data]);
       setNewMsg('');
-    } catch {}
+    } catch (err) {
+      setSendError(
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        (err.response ? `Erreur ${err.response.status}` : "Connexion impossible")
+      );
+    }
     setSending(false);
   };
 
@@ -226,6 +234,7 @@ export default function Messages() {
           </div>
 
           {/* Input */}
+          {sendError && <div style={{ fontSize: '0.8rem', color: '#c0392b', marginBottom: '0.25rem' }}>{sendError}</div>}
           <form onSubmit={sendMessage} style={{ display: 'flex', gap: '0.75rem' }}>
             <input
               value={newMsg}

@@ -64,6 +64,7 @@ const REELS = [
 function ReelCard({ reel, index, isActive, onClick }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError]   = useState(false);
+  const [hovered, setHovered]     = useState(false);
 
   return (
     <motion.div
@@ -71,6 +72,9 @@ function ReelCard({ reel, index, isActive, onClick }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, delay: index * 0.1, ease }}
+      whileHover={!isActive ? { y: -8, scale: 1.03, transition: { duration: 0.3, ease: 'easeOut' } } : {}}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onClick={() => onClick(reel)}
       style={{
         position: 'relative',
@@ -83,6 +87,8 @@ function ReelCard({ reel, index, isActive, onClick }) {
         transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1), height 0.5s cubic-bezier(0.4,0,0.2,1)',
         boxShadow: isActive
           ? `0 32px 80px rgba(0,0,0,0.7), 0 0 0 2px ${reel.accent}55`
+          : hovered
+          ? `0 24px 72px rgba(0,0,0,0.75), 0 0 0 2px ${reel.accent}88`
           : '0 12px 40px rgba(0,0,0,0.5)',
       }}
     >
@@ -99,8 +105,8 @@ function ReelCard({ reel, index, isActive, onClick }) {
           alt={reel.title}
           onLoad={() => setImgLoaded(true)}
           onError={() => setImgError(true)}
-          animate={{ scale: isActive ? 1.08 : 1 }}
-          transition={{ duration: 0.6, ease }}
+          animate={{ scale: isActive ? 1.08 : hovered ? 1.06 : 1 }}
+          transition={{ duration: 0.4, ease }}
           style={{
             position: 'absolute', inset: 0,
             width: '100%', height: '100%',

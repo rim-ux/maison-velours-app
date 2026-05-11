@@ -60,19 +60,19 @@ export default function ClientHome() {
   }, [user]);
 
   useEffect(() => {
-    Promise.all([
-      menuAPI.getProducts(),
-      menuAPI.getCategories(),
-      ordersAPI.myOrders(),
-      menuAPI.bestSellers(8),
-      favoritesAPI.list(),
-    ]).then(([prods, cats, ords, bs, favs]) => {
-      setProducts(  prods.data.results || prods.data);
-      setCategories(cats.data.results  || cats.data);
-      setOrders(    ords.data.results  || ords.data);
-      setBestSellerIds(new Set((bs.data.results || bs.data).map(p => p.id)));
-      setFavoriteIds(new Set(favs.data));
-    }).catch(() => {}).finally(() => setLoading(false));
+    // Produits et catégories en priorité — ne jamais bloquer sur les autres
+    Promise.all([menuAPI.getProducts(), menuAPI.getCategories()])
+      .then(([prods, cats]) => {
+        setProducts(prods.data.results || prods.data);
+        setCategories(cats.data.results || cats.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+
+    // Données secondaires indépendantes
+    ordersAPI.myOrders().then(r => setOrders(r.data.results || r.data)).catch(() => {});
+    menuAPI.bestSellers(8).then(r => setBestSellerIds(new Set((r.data.results || r.data).map(p => p.id)))).catch(() => {});
+    favoritesAPI.list().then(r => setFavoriteIds(new Set(r.data))).catch(() => {});
   }, []);
 
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -85,15 +85,34 @@ export default function ClientHome() {
 
   const handleToggleFav = async (productId) => {
     setTogglingFav(productId);
+    const wasFav = favoriteIds.has(productId);
+    // Optimistic update — feedback immédiat
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      wasFav ? next.delete(productId) : next.add(productId);
+      return next;
+    });
     try {
       const { data } = await favoritesAPI.toggle(productId);
+      // Sync avec la réponse serveur
       setFavoriteIds(prev => {
         const next = new Set(prev);
         data.favorited ? next.add(productId) : next.delete(productId);
         return next;
       });
       toast.push(data.favorited ? 'Ajouté aux favoris ♥' : 'Retiré des favoris', { icon: data.favorited ? '❤️' : '🤍' });
-    } catch {}
+    } catch (err) {
+      // Annule l'update optimiste
+      setFavoriteIds(prev => {
+        const next = new Set(prev);
+        wasFav ? next.add(productId) : next.delete(productId);
+        return next;
+      });
+      const msg = err?.response
+        ? `Erreur serveur (${err.response.status})`
+        : 'Backend non démarré — lance le serveur Django';
+      toast.push(msg, { icon: '⚠️' });
+    }
     setTogglingFav(null);
   };
 

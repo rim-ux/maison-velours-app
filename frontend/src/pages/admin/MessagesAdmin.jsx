@@ -9,6 +9,7 @@ export default function MessagesAdmin() {
   const [newMsg,        setNewMsg]        = useState('');
   const [loading,       setLoading]       = useState(true);
   const [sending,       setSending]       = useState(false);
+  const [sendError,     setSendError]     = useState('');
   const bottomRef = useRef(null);
 
   const loadConversations = () => {
@@ -35,11 +36,14 @@ export default function MessagesAdmin() {
     e.preventDefault();
     if (!newMsg.trim() || !selected) return;
     setSending(true);
+    setSendError('');
     try {
       const { data } = await messagesAPI.send(selected.user_id, newMsg.trim());
       setThread(prev => [...prev, data]);
       setNewMsg('');
-    } catch {}
+    } catch (err) {
+      setSendError(err.response?.data?.error || "Erreur d'envoi, réessayez.");
+    }
     setSending(false);
   };
 
@@ -167,7 +171,9 @@ export default function MessagesAdmin() {
                 </div>
 
                 {/* Input */}
-                <form onSubmit={sendMessage} style={{ padding: '1rem 1.4rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: '0.75rem', background: 'rgba(255,255,255,0.02)', flexShrink: 0 }}>
+                <form onSubmit={sendMessage} style={{ padding: '1rem 1.4rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'rgba(255,255,255,0.02)', flexShrink: 0 }}>
+                  {sendError && <div style={{ fontSize: '0.78rem', color: '#ff6b6b', paddingLeft: '0.25rem' }}>{sendError}</div>}
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <input
                     value={newMsg}
                     onChange={e => setNewMsg(e.target.value)}
@@ -195,6 +201,7 @@ export default function MessagesAdmin() {
                   }}>
                     {sending ? '…' : 'Envoyer'}
                   </button>
+                  </div>
                 </form>
               </>
             )}

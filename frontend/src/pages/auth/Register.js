@@ -6,42 +6,48 @@ export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    username: '', email: '', first_name: '', last_name: '',
-    phone: '', password: '', password2: '',
+    username: '',
+    email: '',
+    first_name: '',
+    last_name: '',
+    phone: '',
+    password: '',
+    password_confirm: '',
   });
-  const [error, setError]   = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); setLoading(true);
-    if (form.password !== form.password2) {
+    setError('');
+
+    if (form.password !== form.password_confirm) {
       setError('Les mots de passe ne correspondent pas.');
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
     try {
-      await register(form);
-      navigate('/menu');
+      const user = await register(form);
+      navigate(user.role === 'admin' ? '/admin' : '/accueil', { replace: true });
     } catch (err) {
       if (!err.response) {
         setError('Impossible de contacter le serveur. Vérifiez que le backend est démarré.');
-        setLoading(false);
-        return;
-      }
-      const data = err.response.data;
-      if (data && typeof data === 'object') {
-        const msgs = Object.entries(data)
-          .flatMap(([key, val]) => {
-            const label = key === 'non_field_errors' ? '' : `${key} : `;
-            return (Array.isArray(val) ? val : [val]).map(m => `${label}${m}`);
-          })
-          .join(' ');
-        setError(msgs || 'Données invalides. Vérifiez les champs.');
       } else {
-        setError('Une erreur est survenue. Veuillez réessayer.');
+        const data = err.response.data;
+        if (data && typeof data === 'object') {
+          const msgs = Object.entries(data)
+            .flatMap(([key, val]) => {
+              const label = key === 'non_field_errors' ? '' : `${key} : `;
+              return (Array.isArray(val) ? val : [val]).map((m) => `${label}${m}`);
+            })
+            .join(' ');
+          setError(msgs || 'Données invalides.');
+        } else {
+          setError('Une erreur est survenue. Veuillez réessayer.');
+        }
       }
     } finally {
       setLoading(false);
@@ -63,41 +69,105 @@ export default function Register() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
             <div className="form-group">
               <label>Prénom</label>
-              <input className="form-control" name="first_name" value={form.first_name} onChange={handleChange} placeholder="Rim" required />
+              <input
+                className="form-control"
+                name="first_name"
+                value={form.first_name}
+                onChange={handleChange}
+                placeholder="Prénom"
+              />
             </div>
             <div className="form-group">
               <label>Nom</label>
-              <input className="form-control" name="last_name" value={form.last_name} onChange={handleChange} placeholder="HIDDANE" required />
+              <input
+                className="form-control"
+                name="last_name"
+                value={form.last_name}
+                onChange={handleChange}
+                placeholder="Nom"
+              />
             </div>
           </div>
+
           <div className="form-group">
-            <label>Nom d'utilisateur</label>
-            <input className="form-control" name="username" value={form.username} onChange={handleChange} placeholder="rim_h" required />
+            <label>Nom d'utilisateur *</label>
+            <input
+              className="form-control"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="nom_utilisateur"
+              autoComplete="username"
+              required
+            />
           </div>
+
           <div className="form-group">
             <label>Email</label>
-            <input className="form-control" type="email" name="email" value={form.email} onChange={handleChange} placeholder="email@exemple.com" required />
+            <input
+              className="form-control"
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="email@exemple.com"
+            />
           </div>
+
           <div className="form-group">
             <label>Téléphone</label>
-            <input className="form-control" name="phone" value={form.phone} onChange={handleChange} placeholder="+212 6 00 00 00 00" />
+            <input
+              className="form-control"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              placeholder="+212 6 00 00 00 00"
+            />
           </div>
+
           <div className="form-group">
-            <label>Mot de passe</label>
-            <input className="form-control" type="password" name="password" value={form.password} onChange={handleChange} placeholder="6 caractères minimum" required />
+            <label>Mot de passe * (6 caractères min.)</label>
+            <input
+              className="form-control"
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              required
+            />
           </div>
+
           <div className="form-group">
-            <label>Confirmer le mot de passe</label>
-            <input className="form-control" type="password" name="password2" value={form.password2} onChange={handleChange} placeholder="••••••••" required />
+            <label>Confirmer le mot de passe *</label>
+            <input
+              className="form-control"
+              type="password"
+              name="password_confirm"
+              value={form.password_confirm}
+              onChange={handleChange}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              required
+            />
           </div>
-          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={loading}>
+
+          <button
+            type="submit"
+            className="btn btn-primary btn-lg"
+            style={{ width: '100%' }}
+            disabled={loading}
+          >
             {loading ? 'Inscription…' : 'S\'inscrire'}
           </button>
         </form>
 
         <p style={styles.footer}>
           Déjà un compte ?{' '}
-          <Link to="/login" style={{ color: 'var(--burgundy)', fontWeight: 600 }}>Se connecter</Link>
+          <Link to="/login" style={{ color: 'var(--burgundy)', fontWeight: 600 }}>
+            Se connecter
+          </Link>
         </p>
       </div>
     </div>

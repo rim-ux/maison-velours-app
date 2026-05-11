@@ -37,7 +37,9 @@ export default function MesFavoris() {
       await favoritesAPI.toggle(productId);
       setProducts(prev => prev.filter(p => p.id !== productId));
       toast.push('Retiré des favoris', { icon: '🤍' });
-    } catch {}
+    } catch {
+      toast.push('Erreur — impossible de retirer le favori', { icon: '⚠️' });
+    }
     setRemoving(null);
   };
 

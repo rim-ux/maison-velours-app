@@ -5,15 +5,29 @@ import { useAuth }  from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { menuAPI }  from '../../services/api';
 
+const PLACEHOLDER = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=70&auto=format&fit=crop';
+
 export default function Cart() {
   const { items, removeItem, updateQty, totalPrice, addItem } = useCart();
   const { user }   = useAuth();
   const toast      = useToast();
   const navigate   = useNavigate();
 
-  const [recs, setRecs]         = useState([]);
+  const [recs, setRecs]               = useState([]);
   const [recsLoading, setRecsLoading] = useState(false);
   const [addedRecId, setAddedRecId]   = useState(null);
+  // Map id → image_url fraîche depuis l'API (remplace les URLs vides/base64 du localStorage)
+  const [freshImages, setFreshImages] = useState({});
+
+  useEffect(() => {
+    menuAPI.getProducts()
+      .then(({ data }) => {
+        const map = {};
+        (data.results || data).forEach(p => { if (p.image_url) map[p.id] = p.image_url; });
+        setFreshImages(map);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (items.length === 0) { setRecs([]); return; }
@@ -61,10 +75,12 @@ export default function Cart() {
           {items.map((item) => (
             <div key={item.id} style={s.item} className="card">
               <div style={s.itemImg}>
-                {item.image_url
-                  ? <img src={item.image_url} alt={item.name} style={s.img} />
-                  : <div style={s.imgPlaceholder}>🍽️</div>
-                }
+                <img
+                  src={freshImages[item.id] || item.image_url || PLACEHOLDER}
+                  alt={item.name}
+                  style={s.img}
+                  onError={e => { e.currentTarget.src = PLACEHOLDER; }}
+                />
               </div>
               <div style={s.itemInfo}>
                 <h3 style={s.itemName}>{item.name}</h3>
@@ -102,10 +118,12 @@ export default function Cart() {
                       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
                       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
                     >
-                      {p.image_url
-                        ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: 100, objectFit: 'cover' }} />
-                        : <div style={{ width: '100%', height: 100, background: 'linear-gradient(135deg,var(--cream-dk),var(--border))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>🍽️</div>
-                      }
+                      <img
+                        src={p.image_url || PLACEHOLDER}
+                        alt={p.name}
+                        style={{ width: '100%', height: 100, objectFit: 'cover' }}
+                        onError={e => { e.currentTarget.src = PLACEHOLDER; }}
+                      />
                       <div style={{ padding: '0.7rem' }}>
                         <p style={{ fontFamily: 'var(--font-head)', fontSize: '0.82rem', fontWeight: 600, color: 'var(--dark)', marginBottom: '0.2rem', lineHeight: 1.3 }}>{p.name}</p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
@@ -174,8 +192,7 @@ const s = {
   item:         { display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem' },
   itemImg:      { width: 70, height: 70, borderRadius: 8, overflow: 'hidden', flexShrink: 0 },
   img:          { width: '100%', height: '100%', objectFit: 'cover' },
-  imgPlaceholder: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--cream-dk)', fontSize: '1.8rem' },
-  itemInfo:     { flex: 1 },
+itemInfo:     { flex: 1 },
   itemName:     { fontFamily: 'var(--font-head)', fontSize: '0.95rem', marginBottom: '0.25rem' },
   itemPrice:    { fontSize: '0.8rem', color: 'var(--muted)' },
   itemControls: { display: 'flex', alignItems: 'center', gap: '1rem' },

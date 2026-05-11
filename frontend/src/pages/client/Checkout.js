@@ -9,7 +9,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 // Utilisation de la clé configurée dans ton fichier .env
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '').catch(() => null);
 
 const ORDER_TYPES = [
   { value: 'sur_place', label: 'Sur place', icon: '🪑', desc: 'Dîner confortablement dans notre restaurant' },
@@ -103,14 +103,14 @@ function CheckoutInner() {
     try {
       if (payMethod === 'en_ligne') {
         if (!stripe || !elements) {
-          setError("Le système de paiement n'est pas prêt. Rechargez la page.");
+          setError("Stripe.js n'a pas pu se charger. Vérifiez votre connexion internet et désactivez les bloqueurs de pub, puis rechargez la page.");
           setLoading(false);
           return;
         }
 
         const { data: intentData } = await api.post('/payments/create-intent/', {
           amount: grandTotal,
-        });
+        }, { timeout: 15000 });
 
         const cardElement = elements.getElement(CardElement);
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
@@ -151,8 +151,16 @@ function CheckoutInner() {
       }
 
     } catch (err) {
-      const msg = err.response?.data;
-      setError(typeof msg === 'string' ? msg : JSON.stringify(msg) || 'Une erreur est survenue.');
+      const data = err.response?.data;
+      const msg = typeof data === 'string'
+        ? data
+        : data?.error || data?.detail
+          || (data?.non_field_errors?.[0])
+          || (data && JSON.stringify(data))
+          || err.message
+          || 'Une erreur est survenue.';
+      setError(msg);
+    } finally {
       setLoading(false);
     }
   };

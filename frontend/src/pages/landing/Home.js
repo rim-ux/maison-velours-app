@@ -52,7 +52,7 @@ function AboutUs() {
           <h2 style={{
             fontFamily: 'var(--font-head)',
             fontSize: 'clamp(2rem, 4vw, 3.1rem)',
-            color: '#fff', lineHeight: 1.2, marginBottom: '2rem',
+            color: '#ffffff', lineHeight: 1.2, marginBottom: '2rem',
           }}>
             Born from passion,<br />
             <span style={{ color: 'var(--gold)' }}>forged by excellence</span>
@@ -90,7 +90,7 @@ function AboutUs() {
 
             <p style={{
               fontFamily: 'var(--font-head)', fontStyle: 'italic',
-              fontSize: '1.2rem', color: 'rgba(255,255,255,0.85)',
+              fontSize: '1.2rem', color: '#ffffff',
               lineHeight: 1.7, marginBottom: '2rem', position: 'relative', zIndex: 1,
             }}>
               Cooking is giving pleasure to those who welcome us.
@@ -126,7 +126,7 @@ function AboutUs() {
               ].map(({ val, label }) => (
                 <div key={label} style={{ textAlign: 'center', flex: 1 }}>
                   <div style={{ fontFamily: 'var(--font-head)', fontSize: '1.4rem', color: 'var(--gold)', fontWeight: 700 }}>{val}</div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.52)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
                 </div>
               ))}
             </div>
@@ -159,31 +159,31 @@ function ContactFooter() {
                 fontSize: '0.75rem', fontWeight: 800, color: '#fff', letterSpacing: '0.06em',
               }}>MV</div>
               <div>
-                <div style={{ fontFamily: 'var(--font-head)', fontSize: '1rem', color: '#fff', fontWeight: 700 }}>Maison Velours</div>
+                <div style={{ fontFamily: 'var(--font-head)', fontSize: '1rem', color: '#ffffff', fontWeight: 700 }}>Maison Velours</div>
                 <div style={{ fontSize: '0.58rem', color: 'var(--gold)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Restaurant Gastronomique</div>
               </div>
             </div>
-            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.38)', lineHeight: 1.75 }}>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.52)', lineHeight: 1.75 }}>
               The art of the table in the heart of Casablanca — a culinary experience crafted in every detail.
             </p>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1, ease }}>
-            <h4 style={{ fontFamily: 'var(--font-head)', color: '#fff', fontSize: '1rem', marginBottom: '1.25rem' }}>Hours</h4>
+            <h4 style={{ fontFamily: 'var(--font-head)', color: '#ffffff', fontSize: '1rem', marginBottom: '1.25rem' }}>Hours</h4>
             {[
               { j: 'Tuesday — Friday', h: '7:30pm — 11:00pm' },
               { j: 'Saturday — Sunday', h: '7:00pm — 11:30pm' },
               { j: 'Monday', h: 'Closed' },
             ].map(({ j, h }) => (
               <div key={j} style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)' }}>{j}</span>
-                <span style={{ fontSize: '0.85rem', color: h === 'Closed' ? 'rgba(231,76,60,0.7)' : 'rgba(255,255,255,0.75)', fontWeight: 500 }}>{h}</span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.52)' }}>{j}</span>
+                <span style={{ fontSize: '0.85rem', color: h === 'Closed' ? 'rgba(231,76,60,0.8)' : '#ffffff', fontWeight: 500 }}>{h}</span>
               </div>
             ))}
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.2, ease }}>
-            <h4 style={{ fontFamily: 'var(--font-head)', color: '#fff', fontSize: '1rem', marginBottom: '1.25rem' }}>Contact</h4>
+            <h4 style={{ fontFamily: 'var(--font-head)', color: '#ffffff', fontSize: '1rem', marginBottom: '1.25rem' }}>Contact</h4>
             {[
               { icon: '📍', text: '47 Boulevard Anfa, Gauthier, Casablanca' },
               { icon: '📞', text: '+212 5 22 XX XX XX' },
@@ -191,13 +191,13 @@ function ContactFooter() {
             ].map(({ icon, text }) => (
               <div key={text} style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.9rem', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '0.85rem' }}>{icon}</span>
-                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.48)', lineHeight: 1.5 }}>{text}</span>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.52)', lineHeight: 1.5 }}>{text}</span>
               </div>
             ))}
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.3, ease }}>
-            <h4 style={{ fontFamily: 'var(--font-head)', color: '#fff', fontSize: '1rem', marginBottom: '1.25rem' }}>Navigation</h4>
+            <h4 style={{ fontFamily: 'var(--font-head)', color: '#ffffff', fontSize: '1rem', marginBottom: '1.25rem' }}>Navigation</h4>
             {[
               { label: 'Menu', id: 'menu-preview' },
               { label: 'About Us', id: 'histoire' },
@@ -208,22 +208,22 @@ function ContactFooter() {
                 style={{
                   display: 'block', width: '100%', textAlign: 'left',
                   background: 'none', border: 'none', cursor: 'pointer',
-                  fontSize: '0.85rem', color: 'rgba(255,255,255,0.42)',
+                  fontSize: '0.85rem', color: 'rgba(255,255,255,0.52)',
                   fontFamily: 'var(--font-body)', padding: '0.35rem 0',
                   transition: 'color 0.2s',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--gold)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.42)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.52)')}
               >{label}</button>
             ))}
           </motion.div>
         </div>
 
         <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '2rem',
+          borderTop: '1px solid rgba(201,168,76,0.08)', paddingTop: '2rem',
           display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem',
         }}>
-          <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.25)' }}>
+          <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.52)' }}>
             © {new Date().getFullYear()} Maison Velours — All rights reserved
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -239,7 +239,7 @@ function ContactFooter() {
   );
 }
 
-/* ── Notre Emplacement (Maps) ── */
+/* ── Notre Emplacement ── */
 function MapSection() {
   const [copied, setCopied] = useState(false);
   const address = '47 Boulevard Anfa, Gauthier, Casablanca 20000, Maroc';
@@ -251,15 +251,22 @@ function MapSection() {
     });
   };
 
+  const INFO = [
+    { icon: '📍', title: 'Adresse', value: address },
+    { icon: '🕐', title: 'Horaires', value: 'Mar – Ven : 19h30 – 23h00\nSam – Dim : 19h00 – 23h30\nLundi : Fermé' },
+    { icon: '📞', title: 'Réservations', value: '+212 5 22 XX XX XX' },
+    { icon: '✉️', title: 'Email', value: 'contact@maisonvelours.ma' },
+  ];
+
   return (
     <section id="emplacement" style={{
       background: '#030308', padding: '7rem 1.5rem',
-      borderTop: '1px solid rgba(201,168,76,0.07)',
+      borderTop: '1px solid rgba(201,168,76,0.08)',
       position: 'relative', overflow: 'hidden',
     }}>
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 700, height: 700, background: 'radial-gradient(ellipse, rgba(139,26,46,0.06) 0%, transparent 65%)', pointerEvents: 'none' }} />
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
 
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         {/* Header */}
         <motion.div style={{ textAlign: 'center', marginBottom: '3.5rem' }}
           initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
@@ -277,45 +284,48 @@ function MapSection() {
           </p>
         </motion.div>
 
-        <motion.div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2.5rem', alignItems: 'start' }}
+        <motion.div
           initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.1, ease }}
+          style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2.5rem', alignItems: 'start' }}
           className="map-grid"
         >
-          {/* Map iframe */}
-          <div style={{ borderRadius: 18, overflow: 'hidden', border: '1px solid rgba(201,168,76,0.15)', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}>
+          {/* Google Maps iframe */}
+          <div style={{
+            borderRadius: 18, overflow: 'hidden',
+            border: '1px solid rgba(201,168,76,0.15)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+            height: 400,
+          }}>
             <iframe
-              title="Maison Velours — Gauthier, Casablanca"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=-7.6366%2C33.5726%2C-7.5966%2C33.6026&layer=mapnik&marker=33.5876%2C-7.6166"
-              style={{ width: '100%', height: 400, border: 'none', display: 'block' }}
+              title="Maison Velours"
+              src="https://maps.google.com/maps?q=Quartier+Gauthier+Casablanca+Maroc&output=embed&z=15"
+              width="100%"
+              height="400"
+              style={{ border: 0, display: 'block' }}
+              allowFullScreen=""
               loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
 
           {/* Info card */}
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 18, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {[
-              { icon: '📍', title: 'Adresse', value: address },
-              { icon: '🕐', title: 'Horaires', value: 'Mar – Ven : 19h30 – 23h00\nSam – Dim : 19h00 – 23h30\nLundi : Fermé' },
-              { icon: '📞', title: 'Réservations', value: '+212 5 22 XX XX XX' },
-              { icon: '✉️', title: 'Email', value: 'contact@maisonvelours.ma' },
-            ].map(({ icon, title, value }) => (
+            {INFO.map(({ icon, title, value }) => (
               <div key={title} style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '1.1rem', marginTop: '0.05rem', flexShrink: 0 }}>{icon}</span>
                 <div>
                   <p style={{ fontSize: '0.64rem', fontWeight: 700, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.3rem' }}>{title}</p>
-                  <p style={{ fontSize: '0.84rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, whiteSpace: 'pre-line' }}>{value}</p>
+                  <p style={{ fontSize: '0.84rem', color: 'rgba(255,255,255,0.52)', lineHeight: 1.65, whiteSpace: 'pre-line' }}>{value}</p>
                 </div>
               </div>
             ))}
 
-            {/* Copy address */}
             <button onClick={copy} style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.55rem', background: copied ? 'rgba(39,174,96,0.12)' : 'rgba(201,168,76,0.1)', border: `1px solid ${copied ? 'rgba(39,174,96,0.3)' : 'rgba(201,168,76,0.2)'}`, color: copied ? '#6fcf97' : 'var(--gold)', borderRadius: 8, padding: '0.6rem 1rem', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.2s' }}>
-              <span style={{ fontSize: '0.9rem' }}>{copied ? '✓' : '📋'}</span>
+              <span>{copied ? '✓' : '📋'}</span>
               {copied ? 'Adresse copiée !' : 'Copier l\'adresse'}
             </button>
 
-            {/* Google Maps link */}
             <a href="https://maps.google.com?q=47+Boulevard+Anfa+Gauthier+Casablanca" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', background: 'rgba(66,133,244,0.1)', border: '1px solid rgba(66,133,244,0.2)', color: '#7ab4f5', borderRadius: 8, padding: '0.6rem 1rem', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', transition: 'background 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(66,133,244,0.18)'}
               onMouseLeave={e => e.currentTarget.style.background = 'rgba(66,133,244,0.1)'}
@@ -338,7 +348,7 @@ function MapSection() {
 /* ── Home page ── */
 export default function Home() {
   return (
-    <div className="landing-page">
+    <div className="landing-page" style={{ background: '#080810' }}>
       <LandingNavbar />
       <Hero />
       <MenuPreview />
