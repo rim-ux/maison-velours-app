@@ -68,8 +68,8 @@ function CheckoutInner() {
   const deliveryFee = orderType === 'livraison' && zone && !freeDelivery
     ? parseFloat(zones.find(z => z.id === parseInt(zone))?.delivery_fee || 0)
     : 0;
-  const discount    = promoApplied ? (totalPrice + deliveryFee) * 0.10 : 0;
-  const grandTotal  = totalPrice + deliveryFee - discount;
+  const discount    = promoApplied ? Math.round((totalPrice + deliveryFee) * 0.10 * 100) / 100 : 0;
+  const grandTotal  = Math.round((totalPrice + deliveryFee - discount) * 100) / 100;
 
   const applyPromo = () => {
     if (promoInput.trim().toLowerCase() === 'maison.velours') {
