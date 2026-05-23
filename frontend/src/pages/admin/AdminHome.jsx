@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { reservationsAPI, menuAPI, clientsAPI } from '../../services/api';
+import { reservationsAPI, menuAPI, clientsAPI, tablesAPI } from '../../services/api';
 import AdminNavbar from '../../components/AdminNavbar';
 
 const HERO = 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=80&auto=format&fit=crop';
@@ -30,6 +30,13 @@ export default function AdminHome() {
   const [showAddProd, setShowAddProd] = useState(false);
   const [prodForm,    setProdForm]    = useState(EMPTY_PROD);
   const [saving,      setSaving]      = useState(false);
+
+  /* ── Table picker (confirmation réservation) ── */
+  const [tableModal,      setTableModal]      = useState(null); // reservation object
+  const [availableTables, setAvailableTables] = useState([]);
+  const [selectedTable,   setSelectedTable]   = useState('');
+  const [tableLoading,    setTableLoading]    = useState(false);
+  const [confirming,      setConfirming]      = useState(false);
 
   /* ── Image upload state ── */
   const [imageFile,    setImageFile]    = useState(null);
@@ -64,10 +71,38 @@ export default function AdminHome() {
   const scrollTo = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
   /* ── Reservation actions ── */
-  const updateResStatus = async (id, status) => {
+  const openTablePicker = async (reservation) => {
+    setTableModal(reservation);
+    setSelectedTable('');
+    setTableLoading(true);
     try {
-      await reservationsAPI.update(id, { status });
-      setReservations(rs => rs.map(r => r.id === id ? { ...r, status } : r));
+      const { data } = await tablesAPI.list({ status: 'libre' });
+      const tables = data.results || data;
+      setAvailableTables(tables.filter(t => t.capacity >= reservation.guests));
+    } catch {
+      setAvailableTables([]);
+    }
+    setTableLoading(false);
+  };
+
+  const confirmWithTable = async () => {
+    if (!selectedTable || !tableModal) return;
+    setConfirming(true);
+    try {
+      const { data } = await reservationsAPI.update(tableModal.id, {
+        status: 'confirmed',
+        table: parseInt(selectedTable, 10),
+      });
+      setReservations(rs => rs.map(r => r.id === tableModal.id ? data : r));
+      setTableModal(null);
+    } catch {}
+    setConfirming(false);
+  };
+
+  const cancelReservation = async (id) => {
+    try {
+      const { data } = await reservationsAPI.update(id, { status: 'cancelled' });
+      setReservations(rs => rs.map(r => r.id === id ? data : r));
     } catch {}
   };
 
@@ -264,14 +299,19 @@ export default function AdminHome() {
                       </div>
                       {r.message && <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--muted)', fontStyle: 'italic' }}>"{r.message}"</p>}
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                      {r.status !== 'confirmed' && (
-                        <button onClick={() => updateResStatus(r.id, 'confirmed')} style={{ background: 'rgba(39,174,96,0.1)', color: '#27AE60', border: '1px solid rgba(39,174,96,0.3)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
-                          ✓ Confirmer
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, flexWrap: 'wrap' }}>
+                      {r.table_number && (
+                        <span style={{ padding: '0.3rem 0.7rem', borderRadius: 20, background: 'rgba(39,174,96,0.1)', border: '1px solid rgba(39,174,96,0.3)', color: '#27AE60', fontSize: '0.72rem', fontWeight: 700 }}>
+                          Table N°{r.table_number}
+                        </span>
+                      )}
+                      {r.status === 'pending' && (
+                        <button onClick={() => openTablePicker(r)} style={{ background: 'rgba(39,174,96,0.1)', color: '#27AE60', border: '1px solid rgba(39,174,96,0.3)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                          ✓ Confirmer & Table
                         </button>
                       )}
                       {r.status !== 'cancelled' && (
-                        <button onClick={() => updateResStatus(r.id, 'cancelled')} style={{ background: 'rgba(231,76,60,0.07)', color: '#E74C3C', border: '1px solid rgba(231,76,60,0.2)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                        <button onClick={() => cancelReservation(r.id)} style={{ background: 'rgba(231,76,60,0.07)', color: '#E74C3C', border: '1px solid rgba(231,76,60,0.2)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
                           ✕ Annuler
                         </button>
                       )}
@@ -407,6 +447,60 @@ export default function AdminHome() {
                 {saving ? 'Enregistrement…' : 'Enregistrer les modifications'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════ TABLE PICKER MODAL ══════════════ */}
+      {tableModal && (
+        <div style={S.backdrop} onClick={() => setTableModal(null)}>
+          <div style={{ ...S.modal, maxWidth: 460 }} onClick={e => e.stopPropagation()}>
+            <div style={S.modalHead}>
+              <h3 style={S.modalTitle}>Assigner une table</h3>
+              <button onClick={() => setTableModal(null)} style={S.closeBtn}>✕</button>
+            </div>
+            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+              <strong>{tableModal.name}</strong> — {tableModal.guests} convive(s) le{' '}
+              {new Date(tableModal.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} à {tableModal.time?.slice(0, 5)}
+            </p>
+            {tableLoading ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}><div className="spinner" /></div>
+            ) : availableTables.length === 0 ? (
+              <div style={{ padding: '1.1rem', background: 'rgba(231,76,60,0.06)', border: '1px solid rgba(231,76,60,0.2)', borderRadius: 'var(--radius-sm)', color: '#E74C3C', fontSize: '0.88rem', textAlign: 'center' }}>
+                Aucune table libre avec capacité suffisante ({tableModal.guests}+ places).
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', maxHeight: 260, overflowY: 'auto' }}>
+                {availableTables.map(t => (
+                  <label key={t.id} style={{
+                    display: 'flex', alignItems: 'center', gap: '0.85rem',
+                    padding: '0.8rem 1rem',
+                    border: `2px solid ${selectedTable === String(t.id) ? 'var(--burgundy)' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius-sm)',
+                    background: selectedTable === String(t.id) ? 'rgba(139,26,46,0.04)' : '#fff',
+                    cursor: 'pointer',
+                  }}>
+                    <input type="radio" name="ah-table" value={t.id}
+                      checked={selectedTable === String(t.id)}
+                      onChange={() => setSelectedTable(String(t.id))}
+                      style={{ accentColor: 'var(--burgundy)' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--dark)' }}>Table N°{t.number}</div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--muted)' }}>{t.capacity} places{t.location ? ` — ${t.location}` : ''}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1.25rem' }}>
+              <button onClick={() => setTableModal(null)} style={{ padding: '0.6rem 1.2rem', background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', borderRadius: 'var(--radius-sm)', fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+                Annuler
+              </button>
+              <button onClick={confirmWithTable} disabled={!selectedTable || confirming || availableTables.length === 0}
+                className="btn btn-primary" style={{ opacity: (!selectedTable || confirming) ? 0.6 : 1 }}>
+                {confirming ? 'Confirmation...' : 'Confirmer la reservation'}
+              </button>
+            </div>
           </div>
         </div>
       )}

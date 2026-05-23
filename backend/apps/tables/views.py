@@ -25,10 +25,10 @@ class TableViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        qs     = super().get_queryset()
-        status = self.request.query_params.get('status')
-        if status:
-            qs = qs.filter(status=status)
+        qs            = super().get_queryset()
+        status_filter = self.request.query_params.get('status')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
         return qs
 
 
@@ -38,19 +38,24 @@ def _send_reservation_notification(reservation, new_status):
         return
     try:
         from apps.notifications.models import Notification
+        table_info = ''
+        if new_status == 'confirmed' and reservation.table:
+            loc = f' ({reservation.table.location})' if reservation.table.location else ''
+            table_info = f' Votre table N°{reservation.table.number}{loc} vous est réservée.'
+
         if new_status == 'confirmed':
             title = 'Réservation confirmée ✓'
             body  = (
-                f"Votre réservation du {reservation.date} à {reservation.time} "
-                f"pour {reservation.guests} personne(s) a été confirmée. "
-                "Connectez-vous et passez votre commande pour finaliser votre expérience !"
+                f"Votre réservation du {reservation.date.strftime('%d/%m/%Y')} à "
+                f"{str(reservation.time)[:5]} pour {reservation.guests} "
+                f"personne(s) a été confirmée.{table_info}"
             )
             ntype = 'reservation_confirmed'
         else:
             title = 'Réservation annulée'
             body  = (
-                f"Votre réservation du {reservation.date} à {reservation.time} "
-                "a malheureusement été annulée. "
+                f"Votre réservation du {reservation.date.strftime('%d/%m/%Y')} à "
+                f"{str(reservation.time)[:5]} a malheureusement été annulée. "
                 "Contactez-nous pour plus d'informations."
             )
             ntype = 'reservation_cancelled'
@@ -67,7 +72,7 @@ def _send_reservation_notification(reservation, new_status):
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset         = Reservation.objects.all().select_related('user')
+    queryset         = Reservation.objects.all().select_related('user', 'table')
     serializer_class = ReservationSerializer
 
     def get_permissions(self):
@@ -83,15 +88,42 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def my_reservations(self, request):
-        qs = Reservation.objects.filter(user=request.user).order_by('-created_at')
+        qs = Reservation.objects.filter(user=request.user).select_related('table').order_by('-created_at')
         return Response(ReservationSerializer(qs, many=True).data)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Admin-only endpoint.
+        Accepts: { status, table } — both optional.
+        The pre_save signal handles auto table.status sync.
+        """
         instance   = self.get_object()
         old_status = instance.status
-        response   = super().partial_update(request, *args, **kwargs)
-        new_status = instance.status
-        # Notify user if status changed to confirmed or cancelled
-        if old_status != new_status and new_status in ('confirmed', 'cancelled'):
+
+        new_status   = request.data.get('status')
+        new_table_id = request.data.get('table')
+
+        valid_statuses = [s[0] for s in Reservation.STATUS_CHOICES]
+        if new_status and new_status not in valid_statuses:
+            return Response({'detail': 'Statut invalide.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_table_id is not None:
+            try:
+                table = Table.objects.get(pk=int(new_table_id))
+                instance.table = table
+            except (Table.DoesNotExist, ValueError):
+                return Response({'detail': 'Table introuvable.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_status:
+            instance.status = new_status
+
+        instance.save()  # triggers pre_save signal → auto table.status sync
+
+        # Reload from DB to get fresh related objects
+        instance.refresh_from_db()
+
+        # Notify client if status changed
+        if new_status and old_status != new_status and new_status in ('confirmed', 'cancelled'):
             _send_reservation_notification(instance, new_status)
-        return response
+
+        return Response(ReservationSerializer(instance).data)

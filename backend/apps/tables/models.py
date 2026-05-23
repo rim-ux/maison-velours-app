@@ -22,6 +22,11 @@ class Reservation(models.Model):
     guests  = models.PositiveIntegerField(default=2, verbose_name='Nombre de convives')
     message = models.TextField(blank=True, verbose_name='Message')
     status  = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    table   = models.ForeignKey(
+        'Table', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='reservations',
+        verbose_name='Table assignée'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

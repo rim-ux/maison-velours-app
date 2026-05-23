@@ -5,6 +5,30 @@ from .models import Order
 from .serializers import OrderSerializer, OrderCreateSerializer
 
 
+def _send_order_notification(order):
+    """Push an in-app notification to the client when the order status changes."""
+    try:
+        from apps.notifications.models import Notification
+        labels = {
+            'en_preparation': ('Commande en préparation 👨‍🍳', 'Votre commande est en cours de préparation.', 'order_update'),
+            'prete':          ('Commande prête ! 🔔',          'Votre commande est prête. Venez la récupérer !', 'order_update'),
+            'livree':         ('Commande livrée 🎉',           'Votre commande a été livrée / servie. Bon appétit !', 'order_update'),
+            'annulee':        ('Commande annulée ✕',           'Votre commande a été annulée. Contactez-nous pour plus d\'informations.', 'order_update'),
+        }
+        if order.status not in labels:
+            return
+        title, body, ntype = labels[order.status]
+        Notification.objects.create(
+            recipient=order.user,
+            type=ntype,
+            title=title,
+            body=body,
+            order_id=order.id,
+        )
+    except Exception:
+        pass
+
+
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -13,7 +37,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if user.role == 'admin':
             qs = Order.objects.select_related('user', 'table', 'delivery_zone').prefetch_related('items__product')
             status_filter = self.request.query_params.get('status')
-            type_filter = self.request.query_params.get('order_type')
+            type_filter   = self.request.query_params.get('order_type')
             if status_filter:
                 qs = qs.filter(status=status_filter)
             if type_filter:
@@ -38,12 +62,14 @@ class OrderViewSet(viewsets.ModelViewSet):
         valid = [s[0] for s in Order.STATUS_CHOICES]
         if new_status not in valid:
             return Response({'detail': 'Statut invalide.'}, status=status.HTTP_400_BAD_REQUEST)
+        old_status = order.status
         order.status = new_status
         order.save(update_fields=['status'])
+        if old_status != new_status:
+            _send_order_notification(order)
         return Response(OrderSerializer(order).data)
 
     @action(detail=False, methods=['get'], url_path='my-orders')
     def my_orders(self, request):
         orders = Order.objects.filter(user=request.user).prefetch_related('items__product')
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+        return Response(OrderSerializer(orders, many=True).data)

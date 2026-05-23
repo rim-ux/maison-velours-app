@@ -99,11 +99,36 @@ export default function MyReservations() {
 
                   {r.status === 'confirmed' && (
                     <div style={{
-                      marginTop: '1rem', padding: '0.75rem 1rem',
+                      marginTop: '1rem', padding: '0.85rem 1.1rem',
                       background: 'rgba(39,174,96,0.06)', border: '1px solid rgba(39,174,96,0.2)',
-                      borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', color: '#27AE60',
+                      borderRadius: 'var(--radius-sm)', fontSize: '0.88rem', color: '#27AE60',
+                      display: 'flex', alignItems: 'center', gap: '0.6rem',
                     }}>
-                      ✅ Réservation confirmée ! Votre table vous attend.
+                      <span style={{ fontSize: '1.2rem' }}>✅</span>
+                      <div>
+                        <div style={{ fontWeight: 700 }}>Réservation confirmée !</div>
+                        {r.table_number ? (
+                          <div style={{ fontSize: '0.82rem', marginTop: '0.2rem' }}>
+                            Votre <strong>Table N°{r.table_number}</strong>
+                            {r.table_location ? ` (${r.table_location})` : ''} vous attend.{' '}
+                            Capacité : {r.table_capacity} place{r.table_capacity > 1 ? 's' : ''}.
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: '0.82rem', marginTop: '0.2rem' }}>
+                            Votre table vous sera indiquée à l'arrivée.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {r.status === 'cancelled' && (
+                    <div style={{
+                      marginTop: '1rem', padding: '0.75rem 1rem',
+                      background: 'rgba(231,76,60,0.06)', border: '1px solid rgba(231,76,60,0.2)',
+                      borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', color: '#E74C3C',
+                    }}>
+                      ✕ Cette réservation a été annulée. Contactez-nous pour plus d'informations.
                     </div>
                   )}
                 </div>
